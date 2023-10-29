@@ -75,9 +75,10 @@ fn print_hint(hint: Vec<i32>, code: [Option<char>; 26]) {
     println!("{}", out)
 }
 
+// to_letter_map will return a map of the index in this word to a known character based on the code given
 fn to_letter_map(hint: &Vec<i32>, code: [Option<char>; 26]) -> HashMap<usize, char> {
     let mut out = HashMap::new();
-    for n in 1..hint.len() {
+    for n in 0..hint.len() {
         let elem = hint[n];
         let codeindex = (elem - 1) as usize;
         let opt = code[codeindex];
@@ -102,13 +103,43 @@ fn find_options(hint: &Vec<i32>, code:[Option<char>; 26], words: Vec<String>) ->
             continue
         }
         for (index, word_char) in word_vec.iter() {
-
             if word.chars().nth(*index).is_some_and(|c| c != *word_char){
                 continue 'outer
             }
+        }
+
+        let matches_pattern = check_word(hint, code, word);
+        if !matches_pattern {
+            continue 'outer
         }
         // this might be it!
         options.push(word.clone())
     }
     options
+}
+
+fn check_word(hint: &Vec<i32>, code:[Option<char>; 26], word: &String) -> bool {
+    assert_eq!(hint.len() , word.len(), "should be the same length");
+
+    let mut code = code.clone();
+
+    // todo work out this algo... for each hint value, check the current code value is not already stored, if it is.. check it's consistent. If it isn't used then store it in memory and move on
+    for (i, c) in hint.iter().enumerate() {
+        let current_word_char = word.chars().nth(i).unwrap();
+        let id = (c-1)as usize;
+        let matches_code = code[id];
+        match matches_code {
+            Some(code_value) => {
+                // if the current value exists as a code but doesn't match the current word
+                if current_word_char != code_value {
+                    return false
+                }
+
+            },
+            None => {
+                code[id] = Some(current_word_char);
+            }
+        }
+    }
+    return true
 }
