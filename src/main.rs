@@ -193,7 +193,6 @@ fn check_word(hint: &Vec<i32>, code:[Option<char>; 26], word: &String) -> bool {
 
     let mut code = code.clone();
 
-    // todo work out this algo... for each hint value, check the current code value is not already stored, if it is.. check it's consistent. If it isn't used then store it in memory and move on
     for (i, c) in hint.iter().enumerate() {
         let current_word_char = word.chars().nth(i).unwrap();
         let id = (c-1)as usize;
